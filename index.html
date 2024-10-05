@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      .cell {
+        width: 30px;
+        height: 30px;
+        border: 1px solid black;
+      }
+      .cell[data-type="1"] {
+        background-color: black;
+      }
+      .cell[data-type="2"] {
+        background-color: green;
+      }
+      .cell[data-type="3"] {
+        background-color: red;
+      }
+      .cell[data-type="4"] {
+        background-color: yellow;
+      }
+    </style>
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <input type="number" id="rows" placeholder="Rows" />
+    <input type="number" id="cols" placeholder="Cols" />
+    <button id="generate">Generate</button>
+    <select id="type">
+      <option value="2">start</option>
+      <option value="1">wall</option>
+      <option value="3">end</option>
+    </select>
+    <button id="solve">Solve</button>
+    <button id="reset">Reset</button>
+
+    <script type="text/javascript">
+      const rows = document.getElementById("rows");
+      const cols = document.getElementById("cols");
+      const generate = document.getElementById("generate");
+      const solve = document.getElementById("solve");
+      const reset = document.getElementById("reset");
+      const table = document.createElement("table");
+      const tbody = document.createElement("tbody");
+
+      table.appendChild(tbody);
+      document.body.appendChild(table);
+      generate.addEventListener("click", handleBoardChange);
+      solve.addEventListener("click", handleFindPath);
+      reset.addEventListener("click", handleBoardChange);
+
+      function renderTable(board) {
+        tbody.innerHTML = "";
+        for (let i = 0; i < board.length; i++) {
+          const row = document.createElement("tr");
+          tbody.appendChild(row);
+          for (let j = 0; j < board[i].length; j++) {
+            const cell = document.createElement("td");
+            cell.classList.add("cell");
+            cell.setAttribute("data-row", i);
+            cell.setAttribute("data-col", j);
+            cell.setAttribute("data-type", board[i][j]);
+            cell.addEventListener("click", handleCellClick);
+            row.appendChild(cell);
+          }
+        }
+      }
+      if (rows.value && cols.value) {
+        handleBoardChange();
+      }
+      function handleBoardChange() {
+        board = createBoard(rows.value, cols.value);
+        renderTable(board);
+      }
+      function handleCellClick(e) {
+        const cell = e.target;
+        const type = Number(document.getElementById("type").value ?? 0);
+        const row = Number(cell.getAttribute("data-row") ?? 0);
+        const col = Number(cell.getAttribute("data-col") ?? 0);
+        console.log(row, col, "clicked");
+        let board;
+        if (type === 1) {
+          board = addWall(row, col);
+        } else if (type === 2) {
+          board = addStart(row, col);
+        } else if (type === 3) {
+          board = addEnd(row, col);
+        }
+        if (board) {
+          renderTable(board);
+        }
+      }
+
+      function handleFindPath() {
+        let board = findPath();
+        if (board) {
+          renderTable(board);
+        }
+      }
+    </script>
+  </body>
+</html>
